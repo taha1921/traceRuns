@@ -1,0 +1,213 @@
+1.37536,Exit slow start,exceeding SS_EXIT_THRESHOLD
+1.75621,Missing packet expired,1135
+3.08949,Timeout
+3.0895,clearing sending list because of timeout
+3.27132,Epoch Error,couldn't send everything within the epoch. Have more to send,14,0
+3.54101,Epoch Error,couldn't send everything within the epoch. Have more to send,81,0
+3.675,Epoch Error,couldn't send everything within the epoch. Have more to send,69,0
+3.81636,Epoch Error,couldn't send everything within the epoch. Have more to send,45,0
+4.2746,Epoch Error,couldn't send everything within the epoch. Have more to send,85,0
+4.54286,Epoch Error,couldn't send everything within the epoch. Have more to send,43,0
+4.6719,Epoch Error,couldn't send everything within the epoch. Have more to send,7,0
+4.74372,Epoch Error,couldn't send everything within the epoch. Have more to send,73,0
+5.2891,Epoch Error,couldn't send everything within the epoch. Have more to send,40,0
+5.67498,Epoch Error,couldn't send everything within the epoch. Have more to send,237,0
+5.91349,Epoch Error,couldn't send everything within the epoch. Have more to send,3,0
+6.0131,Epoch Error,couldn't send everything within the epoch. Have more to send,8,0
+6.34779,Epoch Error,couldn't send everything within the epoch. Have more to send,72,0
+6.7031,Epoch Error,couldn't send everything within the epoch. Have more to send,12,0
+6.82933,Epoch Error,couldn't send everything within the epoch. Have more to send,44,0
+6.8971,Epoch Error,couldn't send everything within the epoch. Have more to send,15,0
+6.94207,Epoch Error,couldn't send everything within the epoch. Have more to send,23,0
+7.027,Epoch Error,couldn't send everything within the epoch. Have more to send,112,0
+7.27029,Epoch Error,couldn't send everything within the epoch. Have more to send,117,0
+7.62824,Epoch Error,couldn't send everything within the epoch. Have more to send,54,0
+8.06251,Missing packet expired,8473
+8.38592,Epoch Error,couldn't send everything within the epoch. Have more to send,12,0
+9.18204,Epoch Error,couldn't send everything within the epoch. Have more to send,30,0
+9.37067,Epoch Error,couldn't send everything within the epoch. Have more to send,27,0
+9.44454,Epoch Error,couldn't send everything within the epoch. Have more to send,6,0
+9.57401,Epoch Error,couldn't send everything within the epoch. Have more to send,5,0
+9.71898,Epoch Error,couldn't send everything within the epoch. Have more to send,260,0
+9.74169,Restart,can't map delay on delay curve
+10.2743,Exit slow start,exceeding SS_EXIT_THRESHOLD
+10.2747,Restart,Alglib M<4!
+11.557,Exit slow start,exceeding SS_EXIT_THRESHOLD
+13.1254,Timeout
+13.1254,clearing sending list because of timeout
+13.8344,Epoch Error,couldn't send everything within the epoch. Have more to send,10,0
+14.3054,Epoch Error,couldn't send everything within the epoch. Have more to send,19,0
+14.5842,Epoch Error,couldn't send everything within the epoch. Have more to send,283,0
+14.9738,Epoch Error,couldn't send everything within the epoch. Have more to send,19,0
+15.0371,Epoch Error,couldn't send everything within the epoch. Have more to send,25,0
+15.4399,Epoch Error,couldn't send everything within the epoch. Have more to send,25,0
+15.646,Epoch Error,couldn't send everything within the epoch. Have more to send,32,0
+15.8388,Epoch Error,couldn't send everything within the epoch. Have more to send,14,0
+15.9122,Epoch Error,couldn't send everything within the epoch. Have more to send,28,0
+15.9734,Epoch Error,couldn't send everything within the epoch. Have more to send,36,0
+16.4392,Epoch Error,couldn't send everything within the epoch. Have more to send,26,0
+16.9133,Epoch Error,couldn't send everything within the epoch. Have more to send,30,0
+17.1776,Epoch Error,couldn't send everything within the epoch. Have more to send,5,0
+17.3093,Epoch Error,couldn't send everything within the epoch. Have more to send,3,0
+17.377,Epoch Error,couldn't send everything within the epoch. Have more to send,11,0
+17.4418,Epoch Error,couldn't send everything within the epoch. Have more to send,24,0
+17.5034,Epoch Error,couldn't send everything within the epoch. Have more to send,10,0
+17.7705,Epoch Error,couldn't send everything within the epoch. Have more to send,105,0
+17.7774,Epoch Error,couldn't send everything within the epoch. Have more to send,17,0
+18.1753,Epoch Error,couldn't send everything within the epoch. Have more to send,53,0
+18.3089,Epoch Error,couldn't send everything within the epoch. Have more to send,6,0
+18.4443,Epoch Error,couldn't send everything within the epoch. Have more to send,13,0
+18.5779,Epoch Error,couldn't send everything within the epoch. Have more to send,33,0
+18.6435,Epoch Error,couldn't send everything within the epoch. Have more to send,10,0
+18.7114,Epoch Error,couldn't send everything within the epoch. Have more to send,26,0
+18.8424,Epoch Error,couldn't send everything within the epoch. Have more to send,9,0
+19.1838,Epoch Error,couldn't send everything within the epoch. Have more to send,22,0
+19.4438,Epoch Error,couldn't send everything within the epoch. Have more to send,9,0
+19.5779,Epoch Error,couldn't send everything within the epoch. Have more to send,41,0
+19.7782,Epoch Error,couldn't send everything within the epoch. Have more to send,33,0
+19.7801,Epoch Error,couldn't send everything within the epoch. Have more to send,8,0
+19.98,Epoch Error,couldn't send everything within the epoch. Have more to send,2,0
+20.1083,Epoch Error,couldn't send everything within the epoch. Have more to send,25,0
+20.3109,Epoch Error,couldn't send everything within the epoch. Have more to send,14,0
+20.3809,Epoch Error,couldn't send everything within the epoch. Have more to send,2,0
+20.5101,Epoch Error,couldn't send everything within the epoch. Have more to send,33,0
+20.5779,Epoch Error,couldn't send everything within the epoch. Have more to send,71,0
+21.246,Epoch Error,couldn't send everything within the epoch. Have more to send,12,0
+21.3679,Missing packet expired,20032
+21.7173,Epoch Error,couldn't send everything within the epoch. Have more to send,69,0
+21.9266,Epoch Error,couldn't send everything within the epoch. Have more to send,47,0
+22.3118,Epoch Error,couldn't send everything within the epoch. Have more to send,48,0
+22.6691,Missing packet expired,21611
+22.7775,Epoch Error,couldn't send everything within the epoch. Have more to send,57,0
+22.8551,Missing packet expired,21748
+22.8902,Missing packet expired,21904
+22.9175,Missing packet expired,21930
+22.9548,Missing packet expired,21977
+23.1088,Epoch Error,couldn't send everything within the epoch. Have more to send,94,0
+23.3084,Epoch Error,couldn't send everything within the epoch. Have more to send,42,0
+23.4413,Epoch Error,couldn't send everything within the epoch. Have more to send,158,0
+23.5731,Epoch Error,couldn't send everything within the epoch. Have more to send,41,0
+23.7119,Epoch Error,couldn't send everything within the epoch. Have more to send,9,0
+23.9763,Epoch Error,couldn't send everything within the epoch. Have more to send,17,0
+24.1736,Epoch Error,couldn't send everything within the epoch. Have more to send,543,0
+24.5645,Epoch Error,couldn't send everything within the epoch. Have more to send,33,0
+24.5931,Missing packet expired,23951
+25.7876,Epoch Error,couldn't send everything within the epoch. Have more to send,50,0
+26.1784,Epoch Error,couldn't send everything within the epoch. Have more to send,49,0
+26.3778,Epoch Error,couldn't send everything within the epoch. Have more to send,49,0
+27.1199,Missing packet expired,26691
+27.1736,Epoch Error,couldn't send everything within the epoch. Have more to send,24,0
+27.3048,Epoch Error,couldn't send everything within the epoch. Have more to send,11,0
+27.4581,Epoch Error,couldn't send everything within the epoch. Have more to send,46,0
+27.4964,Missing packet expired,27201
+27.5182,Missing packet expired,27226
+27.5802,Missing packet expired,27306
+27.8436,Missing packet expired,27568
+27.9791,Epoch Error,couldn't send everything within the epoch. Have more to send,17,0
+28.1077,Epoch Error,couldn't send everything within the epoch. Have more to send,41,0
+28.312,Epoch Error,couldn't send everything within the epoch. Have more to send,155,0
+28.7167,Epoch Error,couldn't send everything within the epoch. Have more to send,88,0
+28.9726,Epoch Error,couldn't send everything within the epoch. Have more to send,12,0
+29.2579,Epoch Error,couldn't send everything within the epoch. Have more to send,192,0
+29.3688,Missing packet expired,29424
+30.2424,Epoch Error,couldn't send everything within the epoch. Have more to send,4,0
+30.3715,Epoch Error,couldn't send everything within the epoch. Have more to send,8,0
+31.25,Epoch Error,couldn't send everything within the epoch. Have more to send,38,0
+31.3719,Epoch Error,couldn't send everything within the epoch. Have more to send,1,0
+31.4533,Epoch Error,couldn't send everything within the epoch. Have more to send,87,0
+31.8421,Epoch Error,couldn't send everything within the epoch. Have more to send,23,0
+32.373,Epoch Error,couldn't send everything within the epoch. Have more to send,29,0
+32.4398,Epoch Error,couldn't send everything within the epoch. Have more to send,23,0
+32.5073,Epoch Error,couldn't send everything within the epoch. Have more to send,8,0
+32.5732,Epoch Error,couldn't send everything within the epoch. Have more to send,28,0
+32.7058,Epoch Error,couldn't send everything within the epoch. Have more to send,294,0
+33.247,Epoch Error,couldn't send everything within the epoch. Have more to send,36,0
+33.6386,Epoch Error,couldn't send everything within the epoch. Have more to send,106,0
+33.773,Epoch Error,couldn't send everything within the epoch. Have more to send,17,0
+33.9058,Epoch Error,couldn't send everything within the epoch. Have more to send,23,0
+33.9798,Epoch Error,couldn't send everything within the epoch. Have more to send,9,0
+34.0391,Epoch Error,couldn't send everything within the epoch. Have more to send,18,0
+34.245,Epoch Error,couldn't send everything within the epoch. Have more to send,41,0
+34.6375,Epoch Error,couldn't send everything within the epoch. Have more to send,10,0
+34.7034,Epoch Error,couldn't send everything within the epoch. Have more to send,20,0
+34.8509,Epoch Error,couldn't send everything within the epoch. Have more to send,39,0
+34.9789,Epoch Error,couldn't send everything within the epoch. Have more to send,25,0
+35.0412,Epoch Error,couldn't send everything within the epoch. Have more to send,9,0
+35.1141,Epoch Error,couldn't send everything within the epoch. Have more to send,15,0
+35.2402,Epoch Error,couldn't send everything within the epoch. Have more to send,24,0
+35.6516,Epoch Error,couldn't send everything within the epoch. Have more to send,13,0
+35.7797,Epoch Error,couldn't send everything within the epoch. Have more to send,16,0
+36.0506,Epoch Error,couldn't send everything within the epoch. Have more to send,1,0
+36.3058,Epoch Error,couldn't send everything within the epoch. Have more to send,25,0
+36.5713,Epoch Error,couldn't send everything within the epoch. Have more to send,27,0
+36.6433,Epoch Error,couldn't send everything within the epoch. Have more to send,11,0
+36.8383,Epoch Error,couldn't send everything within the epoch. Have more to send,26,0
+36.9093,Epoch Error,couldn't send everything within the epoch. Have more to send,11,0
+37.5095,Epoch Error,couldn't send everything within the epoch. Have more to send,16,0
+37.7122,Epoch Error,couldn't send everything within the epoch. Have more to send,16,0
+37.8745,Epoch Error,couldn't send everything within the epoch. Have more to send,9,0
+37.9766,Epoch Error,couldn't send everything within the epoch. Have more to send,26,0
+38.1967,Epoch Error,couldn't send everything within the epoch. Have more to send,38,0
+38.3777,Epoch Error,couldn't send everything within the epoch. Have more to send,21,0
+38.5808,Epoch Error,couldn't send everything within the epoch. Have more to send,246,0
+38.8378,Epoch Error,couldn't send everything within the epoch. Have more to send,7,0
+38.9136,Epoch Error,couldn't send everything within the epoch. Have more to send,126,0
+38.9783,Epoch Error,couldn't send everything within the epoch. Have more to send,26,0
+39.1292,Epoch Error,couldn't send everything within the epoch. Have more to send,44,0
+39.7644,Missing packet expired,41745
+39.9906,Epoch Error,couldn't send everything within the epoch. Have more to send,24,0
+40.0652,Missing packet expired,42113
+40.0886,Missing packet expired,42134
+40.1401,Missing packet expired,42159
+40.1766,Missing packet expired,42222
+40.1875,Missing packet expired,42276
+40.2553,Missing packet expired,42358
+40.4031,Epoch Error,couldn't send everything within the epoch. Have more to send,50,0
+40.715,Epoch Error,couldn't send everything within the epoch. Have more to send,42,0
+40.9783,Epoch Error,couldn't send everything within the epoch. Have more to send,91,0
+41.1799,Epoch Error,couldn't send everything within the epoch. Have more to send,19,0
+41.4624,Epoch Error,couldn't send everything within the epoch. Have more to send,52,0
+41.8566,Epoch Error,couldn't send everything within the epoch. Have more to send,145,0
+42.3173,Epoch Error,couldn't send everything within the epoch. Have more to send,73,0
+42.5181,Missing packet expired,45096
+42.9165,Epoch Error,couldn't send everything within the epoch. Have more to send,33,0
+43.1282,Epoch Error,couldn't send everything within the epoch. Have more to send,90,0
+43.1439,Missing packet expired,45810
+43.5186,Epoch Error,couldn't send everything within the epoch. Have more to send,1,0
+43.7727,Epoch Error,couldn't send everything within the epoch. Have more to send,2,0
+43.8534,Epoch Error,couldn't send everything within the epoch. Have more to send,112,0
+44.2451,Epoch Error,couldn't send everything within the epoch. Have more to send,85,0
+44.5753,Missing packet expired,47573
+45.2141,Missing packet expired,48118
+45.977,Epoch Error,couldn't send everything within the epoch. Have more to send,3,0
+46.1779,Epoch Error,couldn't send everything within the epoch. Have more to send,48,0
+46.3104,Epoch Error,couldn't send everything within the epoch. Have more to send,50,0
+46.436,Epoch Error,couldn't send everything within the epoch. Have more to send,51,0
+46.6541,Epoch Error,couldn't send everything within the epoch. Have more to send,179,0
+46.6631,Epoch Error,couldn't send everything within the epoch. Have more to send,18,0
+46.8572,Epoch Error,couldn't send everything within the epoch. Have more to send,79,0
+47.3809,Epoch Error,couldn't send everything within the epoch. Have more to send,69,0
+47.4252,Missing packet expired,50498
+47.9763,Epoch Error,couldn't send everything within the epoch. Have more to send,3,0
+48.2383,Epoch Error,couldn't send everything within the epoch. Have more to send,16,0
+48.2556,Missing packet expired,51581
+48.8496,Epoch Error,couldn't send everything within the epoch. Have more to send,29,0
+49.9737,Epoch Error,couldn't send everything within the epoch. Have more to send,11,0
+50.9054,Epoch Error,couldn't send everything within the epoch. Have more to send,7,0
+51.3065,Epoch Error,couldn't send everything within the epoch. Have more to send,17,0
+51.6369,Epoch Error,couldn't send everything within the epoch. Have more to send,22,0
+52.0399,Epoch Error,couldn't send everything within the epoch. Have more to send,12,0
+52.3056,Epoch Error,couldn't send everything within the epoch. Have more to send,14,0
+52.3727,Epoch Error,couldn't send everything within the epoch. Have more to send,6,0
+52.5069,Epoch Error,couldn't send everything within the epoch. Have more to send,14,0
+52.6399,Epoch Error,couldn't send everything within the epoch. Have more to send,1,0
+52.7736,Epoch Error,couldn't send everything within the epoch. Have more to send,24,0
+52.9166,Epoch Error,couldn't send everything within the epoch. Have more to send,22,0
+53.0423,Epoch Error,couldn't send everything within the epoch. Have more to send,24,0
+53.1825,Epoch Error,couldn't send everything within the epoch. Have more to send,12,0
+53.3843,Epoch Error,couldn't send everything within the epoch. Have more to send,25,0
+53.5729,Epoch Error,couldn't send everything within the epoch. Have more to send,8,0
+53.6427,Epoch Error,couldn't send everything within the epoch. Have more to send,13,0
+54.042,Epoch Error,couldn't send everything within the epoch. Have more to send,32,0
+54.2507,Epoch Error,couldn't send everything within the epoch. Have more to send,47,0
+54.7138,Epoch Error,couldn't send everything within the epoch. Have more to send

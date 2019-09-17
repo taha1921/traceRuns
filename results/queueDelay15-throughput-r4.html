@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"  standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg onload="if (typeof(gnuplot_svg)!='undefined') gnuplot_svg.Init(evt)" 
- width="1024" height="560" 
+<svg  onload="if (typeof(gnuplot_svg)!='undefined') gnuplot_svg.Init(evt)" 
+ width="1024" height="560"
  viewBox="0 0 1024 560"
  xmlns="http://www.w3.org/2000/svg"
  xmlns:xlink="http://www.w3.org/1999/xlink"
 >
 
 <title>Throughput</title>
-<desc>Produced by GNUPLOT 4.6 patchlevel 6 </desc>
+<desc>Produced by GNUPLOT 5.0 patchlevel 3 </desc>
 
 <script language="javaScript" TYPE="text/javascript" > <![CDATA[
 /*
- * $Id: gnuplot_svg.js,v 1.8.2.2 2014/05/26 22:00:19 sfeam Exp $
+ * $Id: gnuplot_svg.js,v 1.17 2014/05/26 21:59:41 sfeam Exp $
  */
 // Javascript routines for interaction with SVG documents produced by 
 // gnuplot's SVG terminal driver.
@@ -75,6 +75,7 @@ gnuplot_svg.updateCoordBox = function(t, evt) {
     var p = document.documentElement.createSVGPoint(); 
     p.x = evt.clientX; p.y = evt.clientY; 
     p = p.matrixTransform(m.inverse()); 
+    var label_x, label_y;
 
     // Allow for scrollbar position (Firefox, others?)
     if (typeof evt.pageX != 'undefined') {
@@ -83,32 +84,43 @@ gnuplot_svg.updateCoordBox = function(t, evt) {
     t.setAttribute("x", p.x);
     t.setAttribute("y", p.y);
    
-    plotcoord = gnuplot_svg.mouse2plot(p.x,p.y);
+    var plotcoord = gnuplot_svg.mouse2plot(p.x,p.y);
 
-    if (gnuplot_svg.polar_mode) {
+    if (gnuplot_svg.plot_timeaxis_x == "DMS" || gnuplot_svg.plot_timeaxis_y == "DMS") {
+	if (gnuplot_svg.plot_timeaxis_x == "DMS")
+	    label_x = gnuplot_svg.convert_to_DMS(x);
+	else
+	    label_x = plotcoord.x.toFixed(2);
+	if (gnuplot_svg.plot_timeaxis_y == "DMS")
+	    label_y = gnuplot_svg.convert_to_DMS(y);
+	else
+	    label_y = plotcoord.y.toFixed(2);
+
+    } else if (gnuplot_svg.polar_mode) {
 	polar = gnuplot_svg.convert_to_polar(plotcoord.x,plotcoord.y);
 	label_x = "ang= " + polar.ang.toPrecision(4);
 	label_y = "R= " + polar.r.toPrecision(4);
+
     } else if (gnuplot_svg.plot_timeaxis_x == "Date") {
-	gnuplot_svg.axisdate.setTime(1000. * (plotcoord.x + 946684800));
-	year = gnuplot_svg.axisdate.getUTCFullYear();
-	month = gnuplot_svg.axisdate.getUTCMonth();
-	date = gnuplot_svg.axisdate.getUTCDate();
+	gnuplot_svg.axisdate.setTime(1000. * plotcoord.x);
+	var year = gnuplot_svg.axisdate.getUTCFullYear();
+	var month = gnuplot_svg.axisdate.getUTCMonth();
+	var date = gnuplot_svg.axisdate.getUTCDate();
 	label_x = (" " + date).slice (-2) + "/"
 		+ ("0" + (month+1)).slice (-2) + "/"
 		+ year;
 	label_y = plotcoord.y.toFixed(2);
     } else if (gnuplot_svg.plot_timeaxis_x == "Time") {
-	gnuplot_svg.axisdate.setTime(1000. * (plotcoord.x + 946684800));
-	hour = gnuplot_svg.axisdate.getUTCHours();
-	minute = gnuplot_svg.axisdate.getUTCMinutes();
-	second = gnuplot_svg.axisdate.getUTCSeconds();
+	gnuplot_svg.axisdate.setTime(1000. * plotcoord.x);
+	var hour = gnuplot_svg.axisdate.getUTCHours();
+	var minute = gnuplot_svg.axisdate.getUTCMinutes();
+	var second = gnuplot_svg.axisdate.getUTCSeconds();
 	label_x = ("0" + hour).slice (-2) + ":" 
 		+ ("0" + minute).slice (-2) + ":"
 		+ ("0" + second).slice (-2);
 	label_y = plotcoord.y.toFixed(2);
     } else if (gnuplot_svg.plot_timeaxis_x == "DateTime") {
-	gnuplot_svg.axisdate.setTime(1000. * (plotcoord.x + 946684800));
+	gnuplot_svg.axisdate.setTime(1000. * plotcoord.x);
 	label_x = gnuplot_svg.axisdate.toUTCString();
 	label_y = plotcoord.y.toFixed(2);
     } else {
@@ -146,7 +158,7 @@ gnuplot_svg.hideCoordBox = function(evt) {
 gnuplot_svg.toggleCoordBox = function(evt) {
     var t = gnuplot_svg.getText();
     if (null != t) {
-	state = t.getAttribute('visibility');
+	var state = t.getAttribute('visibility');
 	if ('hidden' != state)
 	    state = 'hidden';
 	else
@@ -160,9 +172,93 @@ gnuplot_svg.toggleGrid = function() {
 	return;
     var grid = gnuplot_svg.SVGDoc.getElementsByClassName('gridline');
     for (var i=0; i<grid.length; i++) {
-	state = grid[i].getAttribute('visibility');
+	var state = grid[i].getAttribute('visibility');
 	grid[i].setAttribute('visibility', (state == 'hidden') ? 'visible' : 'hidden');
     }
+}
+
+gnuplot_svg.showHypertext = function(evt, mouseovertext)
+{
+    var anchor_x = evt.clientX;
+    var anchor_y = evt.clientY;
+    // Allow for scrollbar position (Firefox, others?)
+    if (typeof evt.pageX != 'undefined') {
+        anchor_x = evt.pageX; anchor_y = evt.pageY; 
+    }
+    var hypertextbox = document.getElementById("hypertextbox")
+    hypertextbox.setAttributeNS(null,"x",anchor_x+10);
+    hypertextbox.setAttributeNS(null,"y",anchor_y+4);
+    hypertextbox.setAttributeNS(null,"visibility","visible");
+
+    var hypertext = document.getElementById("hypertext")
+    hypertext.setAttributeNS(null,"x",anchor_x+14);
+    hypertext.setAttributeNS(null,"y",anchor_y+18);
+    hypertext.setAttributeNS(null,"visibility","visible");
+
+    var lines = mouseovertext.split('\n');
+    var height = 2+16*lines.length;
+    hypertextbox.setAttributeNS(null,"height",height);
+    var length = hypertext.getComputedTextLength();
+    hypertextbox.setAttributeNS(null,"width",length+8);
+
+    // bounce off frame bottom
+    if (anchor_y > gnuplot_svg.plot_ybot + 16 - height) {
+	anchor_y -= height;
+	hypertextbox.setAttributeNS(null,"y",anchor_y+4);
+	hypertext.setAttributeNS(null,"y",anchor_y+18);
+    }
+
+    while (null != hypertext.firstChild) {
+        hypertext.removeChild(hypertext.firstChild);
+    }
+
+    var textNode = document.createTextNode(lines[0]);
+
+    if (lines.length <= 1) {
+	hypertext.appendChild(textNode);
+    } else {
+	xmlns="http://www.w3.org/2000/svg";
+	var tspan_element = document.createElementNS(xmlns, "tspan");
+	tspan_element.appendChild(textNode);
+	hypertext.appendChild(tspan_element);
+	length = tspan_element.getComputedTextLength();
+	var ll = length;
+
+	for (var l=1; l<lines.length; l++) {
+	    var tspan_element = document.createElementNS(xmlns, "tspan");
+	    tspan_element.setAttributeNS(null,"dy", 16);
+	    textNode = document.createTextNode(lines[l]);
+	    tspan_element.appendChild(textNode);
+	    hypertext.appendChild(tspan_element);
+
+	    ll = tspan_element.getComputedTextLength();
+	    if (length < ll) length = ll;
+	}
+	hypertextbox.setAttributeNS(null,"width",length+8);
+    }
+
+    // bounce off right edge
+    if (anchor_x > gnuplot_svg.plot_xmax + 14 - length) {
+	anchor_x -= length;
+	hypertextbox.setAttributeNS(null,"x",anchor_x+10);
+	hypertext.setAttributeNS(null,"x",anchor_x+14);
+    }
+
+    // left-justify multiline text
+    var tspan_element = hypertext.firstChild;
+    while (tspan_element) {
+	tspan_element.setAttributeNS(null,"x",anchor_x+14);
+	tspan_element = tspan_element.nextElementSibling;
+    }
+
+}
+
+gnuplot_svg.hideHypertext = function ()
+{
+    var hypertextbox = document.getElementById("hypertextbox")
+    var hypertext = document.getElementById("hypertext")
+    hypertextbox.setAttributeNS(null,"visibility","hidden");
+    hypertext.setAttributeNS(null,"visibility","hidden");
 }
 
 // Convert from svg panel mouse coordinates to the coordinate
@@ -171,6 +267,7 @@ gnuplot_svg.mouse2plot = function(mousex,mousey) {
     var plotcoord = new Object;
     var plotx = mousex - gnuplot_svg.plot_xmin;
     var ploty = mousey - gnuplot_svg.plot_ybot;
+    var x,y;
 
     if (gnuplot_svg.plot_logaxis_x != 0) {
 	x = Math.log(gnuplot_svg.plot_axis_xmax)
@@ -211,6 +308,19 @@ gnuplot_svg.convert_to_polar = function (x,y)
     return polar;
 }
 
+gnuplot_svg.convert_to_DMS = function (x)
+{
+    var dms = {d:0, m:0, s:0};
+    var deg = Math.abs(x);
+    dms.d = Math.floor(deg);
+    dms.m = Math.floor((deg - dms.d) * 60.);
+    dms.s = Math.floor((deg - dms.d) * 3600. - dms.m * 60.);
+    fmt = ((x<0)?"-":" ")
+        + dms.d.toFixed(0) + "°"
+	+ dms.m.toFixed(0) + "\""
+	+ dms.s.toFixed(0) + "'";
+    return fmt;
+}
 ]]>
 </script>
 
@@ -237,166 +347,226 @@ onclick="gnuplot_svg.toggleCoordBox(evt)"  onmousemove="gnuplot_svg.moveCoordBox
 	<use xlink:href='#gpPt9' id='gpPt10' fill='currentColor' stroke='none'/>
 	<use xlink:href='#gpPt3' id='gpPt11' stroke='currentColor' transform='rotate(45)'/>
 	<use xlink:href='#gpPt11' id='gpPt12' fill='currentColor' stroke='none'/>
+	<path id='gpPt13' stroke-width='0.222' stroke='currentColor' d='M0,1.330 L1.265,0.411 L0.782,-1.067 L-0.782,-1.076 L-1.265,0.411 z'/>
+	<use xlink:href='#gpPt13' id='gpPt14' fill='currentColor' stroke='none'/>
+	<filter id='textbox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>
+	  <feFlood flood-color='white' flood-opacity='1' result='bgnd'/>
+	  <feComposite in='SourceGraphic' in2='bgnd' operator='atop'/>
+	</filter>
 	<filter id='greybox' filterUnits='objectBoundingBox' x='0' y='0' height='1' width='1'>
 	  <feFlood flood-color='lightgrey' flood-opacity='1' result='grey'/>
 	  <feComposite in='SourceGraphic' in2='grey' operator='atop'/>
 	</filter>
 </defs>
-<g style="fill:none; color:white; stroke:currentColor; stroke-width:1.00; stroke-linecap:round; stroke-linejoin:round">
+<g fill="none" color="white" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
 </g>
-<g style="fill:none; color:black; stroke:currentColor; stroke-width:1.00; stroke-linecap:round; stroke-linejoin:round">
-	<path stroke='black'  d='M63.6,502.4 L72.6,502.4 M999.0,502.4 L990.0,502.4  '/>	<g transform="translate(55.3,506.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 0</text>
-	</g>
-	<path stroke='black'  d='M63.6,454.4 L72.6,454.4 M999.0,454.4 L990.0,454.4  '/>	<g transform="translate(55.3,458.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 10</text>
-	</g>
-	<path stroke='black'  d='M63.6,406.5 L72.6,406.5 M999.0,406.5 L990.0,406.5  '/>	<g transform="translate(55.3,411.0)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 20</text>
-	</g>
-	<path stroke='black'  d='M63.6,358.5 L72.6,358.5 M999.0,358.5 L990.0,358.5  '/>	<g transform="translate(55.3,363.0)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 30</text>
-	</g>
-	<path stroke='black'  d='M63.6,310.5 L72.6,310.5 M999.0,310.5 L990.0,310.5  '/>	<g transform="translate(55.3,315.0)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 40</text>
-	</g>
-	<path stroke='black'  d='M63.6,262.6 L72.6,262.6 M999.0,262.6 L990.0,262.6  '/>	<g transform="translate(55.3,267.1)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 50</text>
-	</g>
-	<path stroke='black'  d='M63.6,214.6 L72.6,214.6 M999.0,214.6 L990.0,214.6  '/>	<g transform="translate(55.3,219.1)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 60</text>
-	</g>
-	<path stroke='black'  d='M63.6,166.6 L72.6,166.6 M999.0,166.6 L990.0,166.6  '/>	<g transform="translate(55.3,171.1)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 70</text>
-	</g>
-	<path stroke='black'  d='M63.6,118.7 L72.6,118.7 M999.0,118.7 L990.0,118.7  '/>	<g transform="translate(55.3,123.2)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 80</text>
-	</g>
-	<path stroke='black'  d='M63.6,70.7 L72.6,70.7 M999.0,70.7 L990.0,70.7  '/>	<g transform="translate(55.3,75.2)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 90</text>
-	</g>
-	<path stroke='black'  d='M63.6,502.4 L63.6,493.4 M63.6,70.7 L63.6,79.7  '/>	<g transform="translate(63.6,524.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text> 0</text>
-	</g>
-	<path stroke='black'  d='M181.7,502.4 L181.7,493.4 M181.7,70.7 L181.7,79.7  '/>	<g transform="translate(181.7,524.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text> 10</text>
-	</g>
-	<path stroke='black'  d='M299.8,502.4 L299.8,493.4 M299.8,70.7 L299.8,79.7  '/>	<g transform="translate(299.8,524.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text> 20</text>
-	</g>
-	<path stroke='black'  d='M417.9,502.4 L417.9,493.4 M417.9,70.7 L417.9,79.7  '/>	<g transform="translate(417.9,524.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text> 30</text>
-	</g>
-	<path stroke='black'  d='M536.0,502.4 L536.0,493.4 M536.0,70.7 L536.0,79.7  '/>	<g transform="translate(536.0,524.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text> 40</text>
-	</g>
-	<path stroke='black'  d='M654.0,502.4 L654.0,493.4 M654.0,70.7 L654.0,79.7  '/>	<g transform="translate(654.0,524.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text> 50</text>
-	</g>
-	<path stroke='black'  d='M772.1,502.4 L772.1,493.4 M772.1,70.7 L772.1,79.7  '/>	<g transform="translate(772.1,524.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text> 60</text>
-	</g>
-	<path stroke='black'  d='M890.2,502.4 L890.2,493.4 M890.2,70.7 L890.2,79.7  '/>	<g transform="translate(890.2,524.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text> 70</text>
-	</g>
-	<path stroke='black'  d='M63.6,70.7 L63.6,502.4 L999.0,502.4 L999.0,70.7 L63.6,70.7 Z  '/>	<g transform="translate(17.6,286.6) rotate(270)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text>throughput (Mbits/s)</text>
-	</g>
-	<g transform="translate(531.3,551.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
-		<text>time (s)</text>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,502.4 L72.6,502.4 M999.0,502.4 L990.0,502.4  '/>	<g transform="translate(55.3,506.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 0</tspan></text>
 	</g>
 </g>
-	<g id="Throughput_plot_1" ><title>Throughput_plot_1</title>
-<g style="fill:none; color:white; stroke:black; stroke-width:0.50; stroke-linecap:round; stroke-linejoin:round">
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,452.4 L72.6,452.4 M999.0,452.4 L990.0,452.4  '/>	<g transform="translate(55.3,456.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 10</tspan></text>
+	</g>
 </g>
-<g style="fill:none; color:red; stroke:currentColor; stroke-width:0.50; stroke-linecap:round; stroke-linejoin:round">
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,402.5 L72.6,402.5 M999.0,402.5 L990.0,402.5  '/>	<g transform="translate(55.3,407.0)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 20</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,352.5 L72.6,352.5 M999.0,352.5 L990.0,352.5  '/>	<g transform="translate(55.3,357.0)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 30</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,302.5 L72.6,302.5 M999.0,302.5 L990.0,302.5  '/>	<g transform="translate(55.3,307.0)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 40</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,252.6 L72.6,252.6 M999.0,252.6 L990.0,252.6  '/>	<g transform="translate(55.3,257.1)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 50</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,202.6 L72.6,202.6 M999.0,202.6 L990.0,202.6  '/>	<g transform="translate(55.3,207.1)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 60</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,152.6 L72.6,152.6 M999.0,152.6 L990.0,152.6  '/>	<g transform="translate(55.3,157.1)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 70</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,102.7 L72.6,102.7 M999.0,102.7 L990.0,102.7  '/>	<g transform="translate(55.3,107.2)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 80</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,52.7 L72.6,52.7 M999.0,52.7 L990.0,52.7  '/>	<g transform="translate(55.3,57.2)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" > 90</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,502.4 L63.6,493.4 M63.6,52.7 L63.6,61.7  '/>	<g transform="translate(63.6,524.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" > 0</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M181.7,502.4 L181.7,493.4 M181.7,52.7 L181.7,61.7  '/>	<g transform="translate(181.7,524.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" > 10</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M299.8,502.4 L299.8,493.4 M299.8,52.7 L299.8,61.7  '/>	<g transform="translate(299.8,524.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" > 20</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M417.9,502.4 L417.9,493.4 M417.9,52.7 L417.9,61.7  '/>	<g transform="translate(417.9,524.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" > 30</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M536.0,502.4 L536.0,493.4 M536.0,52.7 L536.0,61.7  '/>	<g transform="translate(536.0,524.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" > 40</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M654.0,502.4 L654.0,493.4 M654.0,52.7 L654.0,61.7  '/>	<g transform="translate(654.0,524.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" > 50</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M772.1,502.4 L772.1,493.4 M772.1,52.7 L772.1,61.7  '/>	<g transform="translate(772.1,524.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" > 60</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M890.2,502.4 L890.2,493.4 M890.2,52.7 L890.2,61.7  '/>	<g transform="translate(890.2,524.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" > 70</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,52.7 L63.6,502.4 L999.0,502.4 L999.0,52.7 L63.6,52.7 Z  '/></g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<g transform="translate(17.6,277.6) rotate(270)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" >throughput (Mbits/s)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<g transform="translate(531.3,551.9)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="middle">
+		<text><tspan font-family="Arial" >time (s)</tspan></text>
+	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+</g>
+	<g id="Throughput_plot_1" ><title>Capacity (mean 14.35 Mbits/s)</title>
+<g fill="none" color="white" stroke="currentColor" stroke-width="0.50" stroke-linecap="round" stroke-linejoin="round">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="0.50" stroke-linecap="round" stroke-linejoin="round">
 	<g id="Throughput_plot_1_keyentry" visibility="visible" onclick="gnuplot_svg.toggleVisibility(evt,'Throughput_plot_1')">
-	<g transform="translate(472.5,22.5)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text>Capacity (mean 14.35 Mbits/s)</text>
+	<g transform="translate(472.5,22.5)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" >Capacity (mean 14.35 Mbits/s)</tspan></text>
 	</g>
-	<g style = 'stroke:none; shape-rendering:crispEdges'>
-		<polygon fill = 'currentColor' fill-opacity = '0.200000' points = '480.8,22.5 523.0,22.5 523.0,13.5 480.8,13.5 '/>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="0.50" stroke-linecap="round" stroke-linejoin="round">
+	<g stroke='none' shape-rendering='crispEdges'>
+		<polygon fill = 'rgb(148,   0, 211)' fill-opacity = '0.200000' points = '480.8,22.5 523.0,22.5 523.0,13.5 480.8,13.5 '/>
 	</g>
 	</g>
-	<g style = 'stroke:none; shape-rendering:crispEdges'>
-		<polygon fill = 'currentColor' fill-opacity = '0.200000' points = '63.6,434.3 63.6,434.3 69.5,430.1 75.4,433.1 81.3,433.0 87.2,431.2 93.1,430.6 99.0,434.1 104.9,434.0 110.8,435.5 116.7,432.3 122.6,433.0 128.5,431.8 134.5,433.7 140.4,434.9 146.3,436.8
-152.2,436.1 158.1,432.6 164.0,436.0 169.9,433.5 175.8,432.0 181.7,434.2 187.6,433.4 193.5,431.2 199.4,431.4 205.3,432.8 211.2,432.8 217.1,431.8 223.0,433.8 228.9,434.5 234.8,431.9 240.7,437.4
-246.6,434.8 252.5,433.4 258.4,432.1 264.3,433.4 270.3,434.8 276.2,435.9 282.1,434.3 288.0,433.6 293.9,430.6 299.8,431.6 305.7,429.2 311.6,434.9 317.5,434.4 323.4,433.3 329.3,431.5 335.2,434.9
-341.1,436.0 347.0,431.9 352.9,434.2 358.8,447.3 364.7,426.6 370.6,435.6 376.5,437.8 382.4,435.6 388.3,435.2 394.2,434.8 400.2,435.1 406.1,435.5 412.0,430.8 417.9,431.0 423.8,435.9 429.7,432.9
-435.6,432.2 441.5,433.7 447.4,433.3 453.3,432.1 459.2,430.3 465.1,431.3 471.0,431.0 476.9,432.8 482.8,432.5 488.7,431.1 494.6,433.7 500.5,432.8 506.4,432.9 512.3,434.1 518.2,430.3 524.1,435.7
-530.0,435.2 536.0,431.3 541.9,432.8 547.8,432.6 553.7,434.8 559.6,435.9 565.5,433.5 571.4,434.8 577.3,433.8 583.2,435.2 589.1,438.1 595.0,440.3 600.9,432.6 606.8,435.0 612.7,433.5 618.6,431.5
-624.5,435.1 630.4,436.4 636.3,433.0 642.2,435.0 648.1,436.5 654.0,433.1 659.9,434.1 665.8,435.6 671.8,433.4 677.7,431.3 683.6,435.7 689.5,434.3 695.4,432.3 701.3,432.0 707.2,429.6 713.1,434.0
-719.0,434.6 724.9,432.3 730.8,432.5 736.7,432.8 742.6,434.1 748.5,433.0 754.4,433.6 760.3,434.6 766.2,434.2 772.1,430.6 778.0,435.2 783.9,437.0 789.8,436.8 795.7,432.0 801.7,439.1 807.6,431.8
-813.5,434.4 819.4,433.3 825.3,432.9 831.2,434.6 837.1,433.1 843.0,433.7 848.9,435.3 854.8,430.8 860.7,431.2 866.6,433.4 872.5,434.3 878.4,429.8 884.3,432.3 890.2,437.1 896.1,435.0 902.0,434.2
-907.9,430.5 913.8,435.9 919.7,431.1 925.6,435.6 931.5,434.1 937.5,433.7 943.4,434.1 949.3,428.9 955.2,435.2 961.1,430.1 967.0,434.2 972.9,429.1 978.8,431.3 984.7,433.0 990.6,432.9 996.5,471.2
-996.5,502.4 63.6,502.4 '/>
+	<g stroke='none' shape-rendering='crispEdges'>
+		<polygon fill = 'rgb(148,   0, 211)' fill-opacity = '0.200000' points = '63.6,431.5 69.5,427.1 75.4,430.3 81.3,430.1 87.2,428.2 93.1,427.6 99.0,431.2 104.9,431.1 110.8,432.7 116.7,429.4 122.6,430.1 128.5,428.8 134.5,430.9 140.4,432.1 146.3,434.1 152.2,433.4
+158.1,429.7 164.0,433.3 169.9,430.6 175.8,429.1 181.7,431.3 187.6,430.5 193.5,428.2 199.4,428.5 205.3,429.9 211.2,429.9 217.1,428.8 223.0,431.0 228.9,431.7 234.8,428.9 240.7,434.7 246.6,431.9
+252.5,430.5 258.4,429.2 264.3,430.5 270.3,431.9 276.2,433.1 282.1,431.5 288.0,430.7 293.9,427.6 299.8,428.7 305.7,426.2 311.6,432.1 317.5,431.6 323.4,430.4 329.3,428.6 335.2,432.1 341.1,433.3
+347.0,428.9 352.9,431.3 358.8,445.0 364.7,423.4 370.6,432.8 376.5,435.1 382.4,432.8 388.3,432.4 394.2,431.9 400.2,432.3 406.1,432.7 412.0,427.9 417.9,428.0 423.8,433.1 429.7,430.0 435.6,429.3
+441.5,430.9 447.4,430.4 453.3,429.2 459.2,427.3 465.1,428.3 471.0,428.0 476.9,429.9 482.8,429.5 488.7,428.1 494.6,430.9 500.5,429.9 506.4,430.0 512.3,431.2 518.2,427.3 524.1,432.9 530.0,432.4
+536.0,428.3 541.9,429.9 547.8,429.7 553.7,431.9 559.6,433.1 565.5,430.6 571.4,431.9 577.3,431.0 583.2,432.4 589.1,435.4 595.0,437.7 600.9,429.7 606.8,432.2 612.7,430.6 618.6,428.6 624.5,432.3
+630.4,433.6 636.3,430.1 642.2,432.2 648.1,433.7 654.0,430.3 659.9,431.2 665.8,432.8 671.8,430.5 677.7,428.3 683.6,432.9 689.5,431.5 695.4,429.4 701.3,429.1 707.2,426.5 713.1,431.1 719.0,431.8
+724.9,429.4 730.8,429.5 736.7,429.9 742.6,431.2 748.5,430.1 754.4,430.7 760.3,431.8 766.2,431.3 772.1,427.6 778.0,432.4 783.9,434.2 789.8,434.1 795.7,429.1 801.7,436.5 807.6,428.8 813.5,431.6
+819.4,430.4 825.3,430.0 831.2,431.8 837.1,430.3 843.0,430.9 848.9,432.5 854.8,427.9 860.7,428.2 866.6,430.5 872.5,431.5 878.4,426.8 884.3,429.4 890.2,434.3 896.1,432.2 902.0,431.3 907.9,427.5
+913.8,433.1 919.7,428.1 925.6,432.8 931.5,431.2 937.5,430.9 943.4,431.2 949.3,425.8 955.2,432.4 961.1,427.1 967.0,431.3 972.9,426.0 978.8,428.3 984.7,430.1 990.6,430.0 996.5,469.9 996.5,502.4
+63.6,502.4 '/>
 	</g>
 </g>
 	</g>
-	<g id="Throughput_plot_2" ><title>Throughput_plot_2</title>
-<g style="fill:none; color:white; stroke:currentColor; stroke-width:4.00; stroke-linecap:round; stroke-linejoin:round">
+	<g id="Throughput_plot_2" ><title>Traffic ingress (mean 12.51 Mbits/s)</title>
+<g fill="none" color="white" stroke="rgb(148,   0, 211)" stroke-width="4.00" stroke-linecap="round" stroke-linejoin="round">
 </g>
-<g style="fill:none; color:green; stroke:currentColor; stroke-width:4.00; stroke-linecap:round; stroke-linejoin:round">
+<g fill="none" color="black" stroke="currentColor" stroke-width="4.00" stroke-linecap="round" stroke-linejoin="round">
 	<g id="Throughput_plot_2_keyentry" visibility="visible" onclick="gnuplot_svg.toggleVisibility(evt,'Throughput_plot_2')">
-	<g transform="translate(472.5,40.5)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text>Traffic ingress (mean 12.51 Mbits/s)</text>
+	<g transform="translate(472.5,40.5)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" >Traffic ingress (mean 12.51 Mbits/s)</tspan></text>
 	</g>
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="4.00" stroke-linecap="round" stroke-linejoin="round">
 	<path stroke='rgb(  0,  32, 160)'  d='M480.8,36.0 L523.0,36.0  '/>	</g>
-	<path stroke='rgb(  0,  32, 160)'  d='M63.6,502.3 L69.5,470.8 L75.4,362.0 L81.3,306.9 L87.2,502.4 L93.1,502.4 L99.0,502.4 L104.9,472.0 
-		L110.8,434.2 L116.7,447.2 L122.6,431.9 L128.5,410.6 L134.5,429.9 L140.4,464.4 L146.3,433.8 L152.2,420.2 
-		L158.1,434.4 L164.0,427.4 L169.9,445.3 L175.8,432.8 L181.7,429.0 L187.6,444.6 L193.5,438.1 L199.4,494.0 
-		L205.3,157.4 L211.2,502.4 L217.1,502.4 L223.0,502.4 L228.9,501.7 L234.8,480.1 L240.7,472.8 L246.6,442.8 
-		L252.5,451.6 L258.4,456.9 L264.3,490.8 L270.3,350.3 L276.2,502.4 L282.1,502.4 L288.0,502.4 L293.9,488.9 
-		L299.8,463.4 L305.7,455.5 L311.6,429.9 L317.5,430.3 L323.4,497.1 L329.3,283.5 L335.2,502.4 L341.1,502.4 
-		L347.0,502.4 L352.9,501.6 L358.8,490.3 L364.7,466.8 L370.6,424.4 L376.5,406.6 L382.4,369.4 L388.3,502.4 
-		L394.2,502.4 L400.2,489.7 L406.1,429.8 L412.0,379.8 L417.9,497.3 L423.8,439.0 L429.7,427.3 L435.6,430.1 
-		L441.5,433.9 L447.4,439.2 L453.3,417.7 L459.2,442.6 L465.1,424.6 L471.0,442.7 L476.9,422.3 L482.8,402.7 
-		L488.7,466.0 L494.6,450.8 L500.5,420.2 L506.4,436.7 L512.3,417.1 L518.2,447.8 L524.1,427.4 L530.0,427.6 
-		L536.0,443.1 L541.9,463.0 L547.8,445.3 L553.7,434.5 L559.6,424.4 L565.5,417.2 L571.4,448.6 L577.3,492.8 
-		L583.2,450.5 L589.1,375.2 L595.0,469.6 L600.9,502.4 L606.8,490.2 L612.7,411.3 L618.6,116.4 L624.5,502.4 
-		L630.4,502.3 L636.3,475.6 L642.2,259.7 L648.1,502.4 L654.0,502.4 L659.9,502.4 L665.8,499.9 L671.8,458.6 
-		L677.7,441.7 L683.6,435.2 L689.5,437.6 L695.4,423.8 L701.3,434.2 L707.2,425.4 L713.1,437.7 L719.0,424.4 
-		L724.9,441.8 L730.8,431.9 L736.7,439.5 L742.6,400.3 L748.5,455.2 L754.4,483.3 L760.3,337.3 L766.2,502.4 
-		L772.1,496.1 L778.0,417.8 L783.9,461.8 L789.8,442.2 L795.7,423.2 L801.7,414.7 L807.6,415.3 L813.5,462.3 
-		L819.4,479.3 L825.3,440.0 L831.2,406.1 L837.1,502.2 L843.0,452.8 L848.9,454.2 L854.8,428.8 L860.7,425.4 
-		L866.6,437.6 L872.5,424.0 L878.4,443.1 L884.3,431.4 L890.2,432.2 L896.1,431.8 L902.0,438.0 L907.9,428.4 
-		L913.8,441.1 L919.7,424.3 L925.6,441.9 L931.5,429.7 L937.5,445.4 L943.4,431.0 L949.3,437.6 L955.2,431.7 
-		L961.1,431.5 L967.0,431.0 L972.9,438.5 L978.8,434.0 L984.7,430.2 L990.6,435.4 L996.5,471.0  '/></g>
+	<path stroke='rgb(  0,  32, 160)'  d='M63.6,502.3 L69.5,469.4 L75.4,356.2 L81.3,298.7 L87.2,502.4 L93.1,502.4 L99.0,502.4 L104.9,470.8
+		L110.8,431.3 L116.7,444.9 L122.6,428.9 L128.5,406.8 L134.5,426.9 L140.4,462.8 L146.3,431.0 L152.2,416.7
+		L158.1,431.5 L164.0,424.3 L169.9,442.9 L175.8,429.9 L181.7,426.0 L187.6,442.2 L193.5,435.5 L199.4,493.6
+		L205.3,143.0 L211.2,502.4 L217.1,502.4 L223.0,502.4 L228.9,501.7 L234.8,479.2 L240.7,471.6 L246.6,440.3
+		L252.5,449.4 L258.4,455.0 L264.3,490.3 L270.3,344.0 L276.2,502.4 L282.1,502.4 L288.0,502.4 L293.9,488.3
+		L299.8,461.8 L305.7,453.6 L311.6,426.9 L317.5,427.3 L323.4,496.8 L329.3,274.3 L335.2,502.4 L341.1,502.4
+		L347.0,502.4 L352.9,501.6 L358.8,489.8 L364.7,465.3 L370.6,421.1 L376.5,402.6 L382.4,363.9 L388.3,502.4
+		L394.2,502.4 L400.2,489.1 L406.1,426.8 L412.0,374.7 L417.9,497.1 L423.8,436.4 L429.7,424.2 L435.6,427.0
+		L441.5,431.1 L447.4,436.5 L453.3,414.1 L459.2,440.1 L465.1,421.4 L471.0,440.2 L476.9,419.0 L482.8,398.5
+		L488.7,464.5 L494.6,448.6 L500.5,416.7 L506.4,433.9 L512.3,413.5 L518.2,445.5 L524.1,424.3 L530.0,424.4
+		L536.0,440.7 L541.9,461.4 L547.8,442.9 L553.7,431.7 L559.6,421.1 L565.5,413.7 L571.4,446.4 L577.3,492.4
+		L583.2,448.4 L589.1,369.9 L595.0,468.3 L600.9,502.4 L606.8,489.7 L612.7,407.5 L618.6,100.3 L624.5,502.4
+		L630.4,502.3 L636.3,474.4 L642.2,249.6 L648.1,502.4 L654.0,502.4 L659.9,502.4 L665.8,499.8 L671.8,456.8
+		L677.7,439.1 L683.6,432.4 L689.5,434.9 L695.4,420.5 L701.3,431.3 L707.2,422.2 L713.1,435.0 L719.0,421.1
+		L724.9,439.2 L730.8,428.9 L736.7,436.9 L742.6,396.0 L748.5,453.2 L754.4,482.5 L760.3,330.4 L766.2,502.4
+		L772.1,495.9 L778.0,414.3 L783.9,460.1 L789.8,439.7 L795.7,419.9 L801.7,411.1 L807.6,411.6 L813.5,460.6
+		L819.4,478.3 L825.3,437.3 L831.2,402.0 L837.1,502.2 L843.0,450.7 L848.9,452.2 L854.8,425.7 L860.7,422.2
+		L866.6,434.9 L872.5,420.8 L878.4,440.7 L884.3,428.5 L890.2,429.3 L896.1,428.8 L902.0,435.3 L907.9,425.3
+		L913.8,438.5 L919.7,421.0 L925.6,439.4 L931.5,426.7 L937.5,443.0 L943.4,428.0 L949.3,434.9 L955.2,428.7
+		L961.1,428.6 L967.0,428.0 L972.9,435.8 L978.8,431.2 L984.7,427.2 L990.6,432.6 L996.5,469.7  '/></g>
 	</g>
-	<g id="Throughput_plot_3" ><title>Throughput_plot_3</title>
-<g style="fill:none; color:white; stroke:rgb(  0,  32, 160); stroke-width:2.00; stroke-linecap:round; stroke-linejoin:round">
+	<g id="Throughput_plot_3" ><title>Traffic egress (mean 11.39 Mbits/s)</title>
+<g fill="none" color="white" stroke="rgb(  0,  32, 160)" stroke-width="2.00" stroke-linecap="round" stroke-linejoin="round">
 </g>
-<g style="fill:none; color:blue; stroke:currentColor; stroke-width:2.00; stroke-linecap:round; stroke-linejoin:round">
+<g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="round" stroke-linejoin="round">
 	<g id="Throughput_plot_3_keyentry" visibility="visible" onclick="gnuplot_svg.toggleVisibility(evt,'Throughput_plot_3')">
-	<g transform="translate(830.1,22.5)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text>Traffic egress (mean 11.39 Mbits/s)</text>
+	<g transform="translate(830.1,22.5)" stroke="none" fill="black" font-family="Arial" font-size="12.00"  text-anchor="end">
+		<text><tspan font-family="Arial" >Traffic egress (mean 11.39 Mbits/s)</tspan></text>
 	</g>
-	<path stroke='rgb(255,  96,  64)'  d='M838.4,18.0 L880.6,18.0  '/>	</g>
-	<path stroke='rgb(255,  96,  64)'  d='M63.6,502.3 L69.5,485.2 L75.4,433.1 L81.3,433.0 L87.2,436.4 L93.1,502.4 L99.0,502.4 L104.9,491.9 
-		L110.8,435.5 L116.7,432.3 L122.6,436.0 L128.5,431.8 L134.5,433.7 L140.4,438.8 L146.3,436.9 L152.2,436.1 
-		L158.1,432.6 L164.0,436.1 L169.9,433.5 L175.8,432.0 L181.7,434.2 L187.6,433.4 L193.5,431.2 L199.4,490.2 
-		L205.3,451.0 L211.2,432.8 L217.1,471.8 L223.0,502.4 L228.9,501.7 L234.8,488.5 L240.7,464.4 L246.6,450.9 
-		L252.5,443.5 L258.4,456.9 L264.3,490.8 L270.3,437.8 L276.2,436.0 L282.1,491.4 L288.0,502.4 L293.9,495.7 
-		L299.8,459.9 L305.7,452.8 L311.6,437.6 L317.5,437.8 L323.4,481.4 L329.3,467.3 L335.2,434.8 L341.1,457.8 
-		L347.0,502.4 L352.9,501.6 L358.8,493.0 L364.7,464.2 L370.6,444.3 L376.5,437.8 L382.4,435.5 L388.3,435.2 
-		L394.2,457.9 L400.2,489.7 L406.1,453.3 L412.0,432.9 L417.9,431.0 L423.8,445.8 L429.7,432.9 L435.6,432.2 
-		L441.5,433.7 L447.4,433.2 L453.3,432.1 L459.2,430.3 L465.1,431.3 L471.0,430.9 L476.9,432.8 L482.8,432.5 
-		L488.7,431.1 L494.6,433.7 L500.5,438.3 L506.4,432.9 L512.3,434.0 L518.2,430.3 L524.1,435.6 L530.0,435.2 
-		L536.0,431.3 L541.9,446.9 L547.8,440.9 L553.7,439.6 L559.6,436.0 L565.5,437.1 L571.4,434.7 L577.3,470.1 
-		L583.2,490.8 L589.1,438.0 L595.0,440.3 L600.9,433.1 L606.8,490.2 L612.7,466.7 L618.6,431.5 L624.5,435.1 
-		L630.4,500.6 L636.3,477.2 L642.2,442.9 L648.1,436.5 L654.0,482.7 L659.9,502.4 L665.8,499.9 L671.8,459.3 
-		L677.7,447.2 L683.6,435.9 L689.5,434.3 L695.4,432.9 L701.3,432.0 L707.2,429.6 L713.1,433.9 L719.0,434.6 
-		L724.9,432.3 L730.8,432.5 L736.7,432.8 L742.6,434.0 L748.5,433.0 L754.4,466.0 L760.3,463.0 L766.2,434.2 
-		L772.1,444.1 L778.0,461.5 L783.9,437.0 L789.8,436.8 L795.7,432.0 L801.7,439.2 L807.6,431.8 L813.5,434.4 
-		L819.4,445.2 L825.3,444.3 L831.2,435.3 L837.1,468.8 L843.0,468.2 L848.9,448.8 L854.8,430.9 L860.7,431.2 
-		L866.6,433.4 L872.5,434.3 L878.4,429.8 L884.3,432.3 L890.2,437.0 L896.1,435.1 L902.0,434.2 L907.9,430.5 
-		L913.8,435.9 L919.7,431.1 L925.6,435.5 L931.5,434.0 L937.5,433.8 L943.4,434.8 L949.3,428.9 L955.2,435.4 
-		L961.1,430.2 L967.0,434.2 L972.9,431.9 L978.8,436.7 L984.7,435.1 L990.6,434.0 L996.5,471.6  '/></g>
-	</g>
-<g style="fill:none; color:white; stroke:rgb(255,  96,  64); stroke-width:1.00; stroke-linecap:round; stroke-linejoin:round">
 </g>
-<g style="fill:none; color:black; stroke:currentColor; stroke-width:1.00; stroke-linecap:round; stroke-linejoin:round">
-	<path stroke='black'  d='M63.6,70.7 L63.6,502.4 L999.0,502.4 L999.0,70.7 L63.6,70.7 Z  '/></g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='rgb(255,  96,  64)'  d='M838.4,18.0 L880.6,18.0  '/>	</g>
+	<path stroke='rgb(255,  96,  64)'  d='M63.6,502.3 L69.5,484.5 L75.4,430.2 L81.3,430.1 L87.2,433.7 L93.1,502.4 L99.0,502.4 L104.9,491.5
+		L110.8,432.7 L116.7,429.4 L122.6,433.2 L128.5,428.8 L134.5,430.8 L140.4,436.2 L146.3,434.2 L152.2,433.3
+		L158.1,429.7 L164.0,433.3 L169.9,430.6 L175.8,429.1 L181.7,431.3 L187.6,430.5 L193.5,428.2 L199.4,489.7
+		L205.3,448.8 L211.2,429.9 L217.1,470.5 L223.0,502.4 L228.9,501.7 L234.8,487.9 L240.7,462.8 L246.6,448.7
+		L252.5,441.0 L258.4,455.0 L264.3,490.3 L270.3,435.1 L276.2,433.2 L282.1,490.9 L288.0,502.4 L293.9,495.4
+		L299.8,458.1 L305.7,450.7 L311.6,434.9 L317.5,435.1 L323.4,480.5 L329.3,465.8 L335.2,432.0 L341.1,456.0
+		L347.0,502.4 L352.9,501.6 L358.8,492.6 L364.7,462.6 L370.6,441.9 L376.5,435.1 L382.4,432.7 L388.3,432.4
+		L394.2,456.1 L400.2,489.1 L406.1,451.2 L412.0,430.0 L417.9,428.0 L423.8,443.4 L429.7,430.0 L435.6,429.3
+		L441.5,430.8 L447.4,430.4 L453.3,429.2 L459.2,427.3 L465.1,428.3 L471.0,427.9 L476.9,429.9 L482.8,429.5
+		L488.7,428.1 L494.6,430.8 L500.5,435.6 L506.4,430.0 L512.3,431.2 L518.2,427.3 L524.1,432.9 L530.0,432.4
+		L536.0,428.3 L541.9,444.6 L547.8,438.3 L553.7,437.0 L559.6,433.2 L565.5,434.4 L571.4,431.9 L577.3,468.8
+		L583.2,490.3 L589.1,435.3 L595.0,437.7 L600.9,430.2 L606.8,489.7 L612.7,465.2 L618.6,428.6 L624.5,432.3
+		L630.4,500.5 L636.3,476.1 L642.2,440.4 L648.1,433.8 L654.0,481.9 L659.9,502.4 L665.8,499.8 L671.8,457.5
+		L677.7,444.9 L683.6,433.1 L689.5,431.4 L695.4,430.0 L701.3,429.1 L707.2,426.6 L713.1,431.1 L719.0,431.8
+		L724.9,429.4 L730.8,429.5 L736.7,429.9 L742.6,431.2 L748.5,430.1 L754.4,464.5 L760.3,461.4 L766.2,431.3
+		L772.1,441.6 L778.0,459.7 L783.9,434.3 L789.8,434.0 L795.7,429.1 L801.7,436.5 L807.6,428.8 L813.5,431.5
+		L819.4,442.8 L825.3,441.9 L831.2,432.5 L837.1,467.4 L843.0,466.7 L848.9,446.6 L854.8,427.9 L860.7,428.2
+		L866.6,430.5 L872.5,431.4 L878.4,426.8 L884.3,429.4 L890.2,434.3 L896.1,432.3 L902.0,431.3 L907.9,427.5
+		L913.8,433.1 L919.7,428.1 L925.6,432.7 L931.5,431.2 L937.5,431.0 L943.4,432.0 L949.3,425.9 L955.2,432.6
+		L961.1,427.2 L967.0,431.3 L972.9,428.9 L978.8,433.9 L984.7,432.3 L990.6,431.2 L996.5,470.3  '/></g>
+	</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="2.00" stroke-linecap="round" stroke-linejoin="round">
+</g>
+<g fill="none" color="black" stroke="black" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+</g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+	<path stroke='black'  d='M63.6,52.7 L63.6,502.4 L999.0,502.4 L999.0,52.7 L63.6,52.7 Z  '/></g>
+<g fill="none" color="black" stroke="currentColor" stroke-width="1.00" stroke-linecap="round" stroke-linejoin="round">
+</g>
 
 <script type="text/javascript"><![CDATA[
 // plot boundaries and axis scaling information for mousing 
@@ -405,9 +575,9 @@ gnuplot_svg.plot_term_ymax = 560;
 gnuplot_svg.plot_xmin = 63.6;
 gnuplot_svg.plot_xmax = 999.0;
 gnuplot_svg.plot_ybot = 502.4;
-gnuplot_svg.plot_ytop = 70.7;
+gnuplot_svg.plot_ytop = 52.7;
 gnuplot_svg.plot_width = 935.4;
-gnuplot_svg.plot_height = 431.7;
+gnuplot_svg.plot_height = 449.7;
 gnuplot_svg.plot_axis_xmin = 0;
 gnuplot_svg.plot_axis_xmax = 79.212;
 gnuplot_svg.plot_axis_ymin = 0;
@@ -418,11 +588,20 @@ gnuplot_svg.plot_axis_y2min = "none"
 gnuplot_svg.plot_logaxis_x = 0;
 gnuplot_svg.plot_logaxis_y = 0;
 gnuplot_svg.plot_timeaxis_x = "";
+gnuplot_svg.plot_timeaxis_y = "";
 ]]>
 </script>
 </g>
 
   <text id="coord_text" text-anchor="start" pointer-events="none"
+  font-size="12" font-family="Arial"
+  visibility="hidden"> </text>
+
+  <rect id="hypertextbox" class="hypertextbox" pointer-events="none"
+  fill="white" stroke="black" opacity="0.8"
+  height="16" visibility="hidden" />
+
+  <text id="hypertext" class="hypertext" pointer-events="none"
   font-size="12" font-family="Arial"
   visibility="hidden"> </text>
 </svg>
